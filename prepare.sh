@@ -25,8 +25,9 @@ EOF
 
 echo "prepare packets"
 cat > /mnt/pkg.sh <<EOF
-pacman -S vim intel-ucode alsa-utils neofetch nmap smartmontools xorg-server xorg-xinit ttf-bitstream-vera ttf-freefont ttf-liberation ttf-linux-libertine grub --noconfirm
-yaourt -S termite --noconfirm
+pacman -S vim intel-ucode alsa-utils neofetch nmap smartmontools xorg-server xorg-xinit ttf-ubuntu-font-family ttf-bitstream-vera ttf-freefont ttf-liberation ttf-linux-libertine grub --noconfirm
+
+yaourt -S termite i3-gaps compton polybar --noconfirm
 EOF
 
 
