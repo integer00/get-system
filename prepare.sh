@@ -1,5 +1,7 @@
 #!/bin/bash
-
+#todo:
+#add if/else statements
+#add add control flow check
 if [[ $# -eq 0 ]] ; then
 	echo "USAGE: set partition to install."
 	echo ""
@@ -7,36 +9,14 @@ if [[ $# -eq 0 ]] ; then
 fi
 
 mount $1 /mnt
-#pacstrap /mnt base base-devel git 
-#genfstab -U /mnt > /mnt/etc/fstab
-echo "done"
+pacstrap /mnt base base-devel git 
+genfstab -U /mnt > /mnt/etc/fstab
+echo "done installing system"
 
-echo "prepare initial script"
-cat > /mnt/prepare.sh <<EOF
-cd /tmp
-git clone https://aur.archlinux.org/package-query.git
-cd package-query
-makepkg -si
-cd /tmp
-git clone https://aur.archlinux.org/yaourt.git
-cd yaourt
-makepkg -si
-EOF
+mkdir /mnt/home/integer
+chown -R integer:integer /mnt/home/integer
 
-echo "prepare packets"
-cat > /mnt/pkg.sh <<EOF
-pacman -S vim intel-ucode alsa-utils neofetch nmap smartmontools xorg-server xorg-xinit ttf-ubuntu-font-family ttf-bitstream-vera ttf-freefont ttf-liberation ttf-linux-libertine grub --noconfirm
-
-yaourt -S termite i3-gaps compton polybar --noconfirm
-EOF
-
-
-chmod +x /mnt/prepare.sh
-chmod +x /mnt/pkg.sh
-
-chown integer:integer /mnt/temp.sh
-chown integer:integer /mnt/pkg.sh
-
+echo "adding user"
 cat >> /mnt/etc/passwd <<EOF
 integer:x:1000:1000::/home/integer:/bin/bash
 EOF
@@ -50,8 +30,40 @@ cat >> /mnt/etc/sudoers <<EOF
 integer ALL=(ALL) ALL
 EOF
 
-mkdir /mnt/home/integer
-chown -R integer:integer /mnt/home/integer
+echo "prepare initial script"
 
+cat > /mnt/home/integer/prepare.sh <<EOF
+cd /tmp
+git clone https://aur.archlinux.org/package-query.git
+cd package-query
+makepkg -si
+cd /tmp
+git clone https://aur.archlinux.org/yaourt.git
+cd yaourt
+makepkg -si
+EOF
+
+echo "prepare packets"
+cat > /mnt/home/integer/pkg.sh <<EOF
+pacman -Sy dmenu feh vim alsa-utils neofetch nmap smartmontools xorg-server xorg-xinit ttf-ubuntu-font-family ttf-bitstream-vera ttf-freefont ttf-liberation ttf-linux-libertine grub 
+
+yaourt -Sy google-chrome termite i3-gaps compton polybar 
+EOF
+
+chown integer:integer /mnt/home/integer/temp.sh
+chown integer:integer /mnt/home/integer/pkg.sh
+
+chmod +x /mnt/home/integer/prepare.sh
+chmod +x /mnt/home/integer/pkg.sh
+
+
+cat >> /mnt/home/integer/.xinitrc <<EOF
+exec i3
+EOF
+
+echo "copy configs"
+cp -rv ./.config ./.fonts ./Pictures ./b43 /home/integer
+
+echo "install stuff"
 arch-chroot -u integer /mnt /prepare.sh
 arch-chroot -u integer /mnt /pkg.sh

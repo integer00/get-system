@@ -1,0 +1,9 @@
+#!/bin/bash
+#check connection v0.01
+
+CHECK_CONNECTION=$(ifconfig|grep ppp0|grep -o UP)
+
+
+if [ "${CHECK_CONNECTION}" == UP ]; then
+	echo ""
+fi

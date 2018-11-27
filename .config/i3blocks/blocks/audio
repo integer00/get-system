@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Left click
+if [ "${BLOCK_BUTTON}" -eq 1 -o "${BLOCK_BUTTON}" -eq 4 ]; then
+  ossmix -q -- vol.pcm +2
+# Middle click
+elif [[ "${BLOCK_BUTTON}" -eq 2 ]]; then
+  ossmix -q vol.mute toggle
+# Right click
+elif [ "${BLOCK_BUTTON}" -eq 3 -o "${BLOCK_BUTTON}" -eq 5 ]; then
+  ossmix -q -- vol.pcm -2
+fi
+
+statusLine=$(ossmix vol.pcm | tail -n 1)
+status=$(echo "${statusLine}" | grep -wo "0:0")
+mute=$(ossmix vol.mute | grep -wo "ON")
+volume=$(echo "${statusLine}" | awk -F ':' '{print $2}') 
+
+if [ "${status}" == "0:0" -o "${mute}" == "ON" ]; then
+  echo "off"
+  echo "off"
+  echo ""
+else
+  echo "${volume}%"
+  echo "${volume}%"	
+   echo ""
+fi

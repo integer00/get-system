@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+# Left click
+if [ "${BLOCK_BUTTON}" -eq 1 ]; then
+  cmus-remote -n
+fi
+
+
+
+INFO_CMUS=$(cmus-remote -Q 2>/dev/null)
+if [[ $? -eq 0 ]]; then
+  INFO_TITLE=$(echo "${INFO_CMUS}" | sed -n -e 's/^.*title//p' | head -n 1)
+  INFO_ALBUM=$(echo "${INFO_CMUS}" | sed -n -e 's/^.*album//p' | head -n 1)
+  INFO_ARTIST=$(echo "${INFO_CMUS}" | sed -n -e 's/^.*artist//p' | head -n 1)
+  INFO_FILENAME=$(echo "${INFO_CMUS}" | sed -n -e 's/^.*file//p'|awk -F '.cue,.flac,.mp3,.wav' '{print $0}'|awk -F '/' '{print $NF}')
+else
+  exit
+fi
+
+if [[ "${INFO_ARTIST}" ]] && [[ "${INFO_TITLE}" ]]; then
+  OUT_TEXT=$(echo "${INFO_ARTIST} - ${INFO_TITLE}" | xargs)
+elif [[ "${INFO_TITLE}" ]]; then
+  OUT_TEXT=$(echo "${INFO_TITLE}" | xargs)
+elif [[ "${INFO_FILENAME}" ]]; then
+  OUT_TEXT=$(echo "${INFO_FILENAME}" |xargs)
+
+fi
+
+echo "${OUT_TEXT}"
+echo "${OUT_TEXT}"
+exit
