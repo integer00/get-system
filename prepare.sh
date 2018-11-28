@@ -7,6 +7,7 @@ if [[ $# -eq 0 ]] ; then
 	echo ""
 	exit 0
 fi
+useradd integer
 
 mount $1 /mnt
 pacstrap /mnt base base-devel git 
@@ -14,7 +15,6 @@ genfstab -U /mnt > /mnt/etc/fstab
 echo "done installing system"
 
 mkdir /mnt/home/integer
-chown -R integer:integer /mnt/home/integer
 
 echo "adding user"
 cat >> /mnt/etc/passwd <<EOF
@@ -24,7 +24,7 @@ cat >> /mnt/etc/group <<EOF
 integer:x:1000:
 EOF
 cat >> /mnt/etc/shadow <<EOF
-integer:$6$2hk72LazobUbRJtp$mnJaFhAiDe8FULOG3yh32hTQwc4MUK.WijhGO0O/gP1Yfzg0wDkbt7.8R7B5.a04ICO1DWY36GPYexaOX1IyL/:17861:0:99999:7:::
+integer:\$6\$2hk72LazobUbRJtp\$mnJaFhAiDe8FULOG3yh32hTQwc4MUK.WijhGO0O/gP1Yfzg0wDkbt7.8R7B5.a04ICO1DWY36GPYexaOX1IyL/:17861:0:99999:7:::
 EOF
 cat >> /mnt/etc/sudoers <<EOF
 integer ALL=(ALL) ALL
@@ -45,13 +45,15 @@ EOF
 
 echo "prepare packets"
 cat > /mnt/home/integer/pkg.sh <<EOF
-pacman -Sy dmenu feh vim alsa-utils neofetch nmap smartmontools xorg-server xorg-xinit ttf-ubuntu-font-family ttf-bitstream-vera ttf-freefont ttf-liberation ttf-linux-libertine grub 
+sudo pacman -Sy intel-ucode dmenu feh vim alsa-utils neofetch nmap smartmontools xorg-server xorg-xinit ttf-ubuntu-font-family ttf-bitstream-vera ttf-freefont ttf-liberation ttf-linux-libertine grub 
 
 yaourt -Sy google-chrome termite i3-gaps compton polybar 
+
+sudo mkdir /boot/grub
+sudo grub-mkconfig /boot/grub/grub.cfg
 EOF
 
-chown integer:integer /mnt/home/integer/temp.sh
-chown integer:integer /mnt/home/integer/pkg.sh
+chown -R integer:integer /mnt/home/integer
 
 chmod +x /mnt/home/integer/prepare.sh
 chmod +x /mnt/home/integer/pkg.sh
@@ -62,8 +64,8 @@ exec i3
 EOF
 
 echo "copy configs"
-cp -rv ./.config ./.fonts ./Pictures ./b43 /home/integer
+cp -rv ./.config ./.fonts ./Pictures ./b43 /mnt/home/integer
 
 echo "install stuff"
-arch-chroot -u integer /mnt /prepare.sh
-arch-chroot -u integer /mnt /pkg.sh
+arch-chroot -u integer /mnt /home/integer/prepare.sh
+arch-chroot -u integer /mnt /home/integer/pkg.sh
