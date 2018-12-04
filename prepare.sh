@@ -33,6 +33,7 @@ EOF
 echo "prepare initial script"
 
 cat > /mnt/home/integer/prepare.sh <<EOF
+#!/bin/bash
 cd /tmp
 git clone https://aur.archlinux.org/package-query.git
 cd package-query
@@ -45,19 +46,16 @@ EOF
 
 echo "prepare packets"
 cat > /mnt/home/integer/pkg.sh <<EOF
-sudo pacman -Sy intel-ucode dmenu feh vim alsa-utils neofetch nmap smartmontools xorg-server xorg-xinit ttf-ubuntu-font-family ttf-bitstream-vera ttf-freefont ttf-liberation ttf-linux-libertine grub 
+#!/bin/bash
+sudo pacman -Sy stubby intel-ucode dmenu feh vim alsa-utils neofetch nmap smartmontools xorg-server xorg-xinit ttf-ubuntu-font-family ttf-bitstream-vera ttf-freefont ttf-liberation ttf-linux-libertine grub 
 
 yaourt -Sy google-chrome termite i3-gaps compton polybar 
 
 sudo mkdir /boot/grub
 sudo grub-mkconfig /boot/grub/grub.cfg
+systemctl enable stubby
+
 EOF
-
-chown -R integer:integer /mnt/home/integer
-
-chmod +x /mnt/home/integer/prepare.sh
-chmod +x /mnt/home/integer/pkg.sh
-
 
 cat >> /mnt/home/integer/.xinitrc <<EOF
 exec i3
@@ -66,6 +64,54 @@ EOF
 echo "copy configs"
 cp -rv ./.config ./.fonts ./Pictures ./b43 /mnt/home/integer
 
+chown -R integer:integer /mnt/home/integer
+
+chmod +x /mnt/home/integer/prepare.sh
+chmod +x /mnt/home/integer/pkg.sh
+
 echo "install stuff"
 arch-chroot -u integer /mnt /home/integer/prepare.sh
 arch-chroot -u integer /mnt /home/integer/pkg.sh
+
+echo "set config files"
+
+cat > /mnt/etc/stubby/stubby.yml << EOF
+
+resolution_type: GETDNS_RESOLUTION_STUB
+
+dns_transport_list:
+  - GETDNS_TRANSPORT_TLS
+
+tls_authentication: GETDNS_AUTHENTICATION_REQUIRED
+
+tls_query_padding_blocksize: 128
+
+edns_client_subnet_private : 1
+
+round_robin_upstreams: 1
+
+idle_timeout: 10000
+
+listen_addresses:
+  - 127.0.0.1
+  - 0::1
+
+appdata_dir: "/var/cache/stubby"
+
+upstream_recursive_servers:
+  - address_data: 1.1.1.1
+    tls_auth_name: "cloudflare-dns.com"
+  - address_data: 1.0.0.1
+    tls_auth_name: "cloudflare-dns.com"
+  - address_data: 2606:4700:4700::1111
+    tls_auth_name: "cloudflare-dns.com"
+  - address_data: 2606:4700:4700::1001
+    tls_auth_name: "cloudflare-dns.com"
+EOF
+
+cat > /mnt/etc/resolv.conf <<EOF
+nameserver localhost
+EOF
+
+
+echo "done"
