@@ -42,14 +42,14 @@ padding-right = 2
 module-margin-left = 1
 module-margin-right = 2
 
-font-0 = SFNS Display:pixelsize=9;1
+font-0 = SFNS Display:pixelsize=13;1
 font-1 = unifont:fontformat=truetype:size=8:antialias=false;0
 font-2 = siji:pixelsize=10;1
 font-3 = fontawesome-webfont:pixelsize=10;1
 
 modules-left = i3 
 modules-center = title
-modules-right = powermenu load-average volume xkeyboard date 
+modules-right = powermenu battery load-average volume xkeyboard date 
 
 tray-position = right
 tray-padding = 2

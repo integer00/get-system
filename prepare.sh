@@ -2,6 +2,9 @@
 #todo:
 #add if/else statements
 #add add control flow check
+#add case for chroot/on place installing
+#add choose menu for config : 1) default 2) macbook 2014 3)macbook 2011 etc
+
 if [[ $# -eq 0 ]] ; then
 	echo "USAGE: set partition to install."
 	echo ""
@@ -47,17 +50,21 @@ EOF
 echo "prepare packets"
 cat > /mnt/home/integer/pkg.sh <<EOF
 #!/bin/bash
-sudo pacman -Sy stubby intel-ucode dmenu feh vim alsa-utils neofetch nmap smartmontools xorg-server xorg-xinit ttf-ubuntu-font-family ttf-bitstream-vera ttf-freefont ttf-liberation ttf-linux-libertine grub 
+sudo pacman -Sy openssh stubby intel-ucode dmenu feh vim alsa-utils neofetch nmap smartmontools xorg-server xorg-xinit ttf-ubuntu-font-family ttf-bitstream-vera ttf-freefont ttf-liberation ttf-linux-libertine grub 
 
 yaourt -Sy google-chrome termite i3-gaps compton polybar 
 
 sudo mkdir /boot/grub
-sudo grub-mkconfig /boot/grub/grub.cfg
+sudo grub-mkconfig > /boot/grub/grub.cfg
+
 systemctl enable stubby
 
 EOF
 
 cat >> /mnt/home/integer/.xinitrc <<EOF
+xrandr -S 1920x1080
+xrandr --dpi 140
+
 exec i3
 EOF
 
@@ -113,5 +120,10 @@ cat > /mnt/etc/resolv.conf <<EOF
 nameserver localhost
 EOF
 
+cat > /mnt/etc/vconsole.conf <<EOF
+FONT=sun12x22
+EOF
+
 
 echo "done"
+

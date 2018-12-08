@@ -235,7 +235,7 @@ client.focused	#000000 #222222 #ffffff #00ff00
 #exec programs 
 #
 #
-#exec compton -b
+exec compton -b
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 #exec skippy-xd --start-daemon
 exec feh --bg-fill ~/Pictures/sea.jpg
