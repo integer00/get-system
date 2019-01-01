@@ -124,6 +124,10 @@ cat > /mnt/etc/vconsole.conf <<EOF
 FONT=sun12x22
 EOF
 
+cat >> /etc/systemd/logind.conf <<EOF
+HandlePowerKey=ignore
+EOF
+
 
 echo "done"
 
